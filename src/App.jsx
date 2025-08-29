@@ -1,60 +1,65 @@
-
 import React, { useState, useEffect } from "react";
+import "./App.css";
+
+// Фон: положите файл с ИМЕНЕМ ровно "android_reseized.png" в папку public/
+const BG_IMAGE = "/android_reseized.png";
 
 const App = () => {
   const [votes, setVotes] = useState([]);
   const [userVote, setUserVote] = useState({
-    emotionality: 5,
-    masculinity: 7,
-    sexuality: 4,
-    intellect: 9,
-    sociability: 5,
-    decisiveness: 6,
+    emotionality: 5,   // Эмоциональность
+    masculinity: 5,    // Мужественность
+    sexuality: 5,      // Сексуальность
+    intellect: 5,      // Интеллект
+    athleticism: 5,    // Атлетичность
+    decisiveness: 5,   // Решительность
   });
   const [showResults, setShowResults] = useState(false);
   const [finalResult, setFinalResult] = useState(null);
   const [userResult, setUserResult] = useState(null);
 
+  // Параметры и метки для UI
   const parameters = [
     { name: "Эмоциональность", key: "emotionality" },
     { name: "Мужественность", key: "masculinity" },
     { name: "Сексуальность", key: "sexuality" },
     { name: "Интеллект", key: "intellect" },
-    { name: "Общительность", key: "sociability" },
+    { name: "Атлетичность", key: "athleticism" },
     { name: "Решительность", key: "decisiveness" },
   ];
 
-  const determineType = (vote) => {
+  // Определение типа (амплуа)
+  // Подбираем веса под новую логику:
+  // - "интеллектуал": упор на интеллект, немного на эмоции и решительность
+  // - "решала": решительность + мужественность, чуть интеллект/сексуальность
+  // - "спортик": атлетичность + мужественность, плюс немного сексуальности
+  const determineType = (v) => {
     const scores = {
-      "Мачо": vote.sexuality * 0.4 + vote.emotionality * 0.3 + vote.masculinity * 0.5 + vote.sociability * 0.1,
-      "Сапиосексуал": vote.sexuality * 0.4 + vote.emotionality * 0.3 + vote.sociability * 0.3 + vote.decisiveness * 0.2,
-      "Интеллектуал": vote.intellect * 0.6 + vote.emotionality * 0.2 + vote.sociability * 0.2 + vote.decisiveness * 0.2,
+      "интеллектуал": v.intellect * 0.5 + v.emotionality * 0.2 + v.decisiveness * 0.2 + v.masculinity * 0.1,
+      "решала":       v.decisiveness * 0.45 + v.masculinity * 0.35 + v.intellect * 0.1 + v.sexuality * 0.1,
+      "спортик":      v.athleticism * 0.5 + v.masculinity * 0.3 + v.sexuality * 0.2,
     };
-    const maxScore = Math.max(...Object.values(scores));
-    return Object.keys(scores).find(key => scores[key] === maxScore);
+    const max = Math.max(...Object.values(scores));
+    return Object.keys(scores).find((k) => scores[k] === max);
   };
 
   const handleInputChange = (key, value) => {
-    setUserVote(prev => ({
-      ...prev,
-      [key]: parseInt(value)
-    }));
+    setUserVote((prev) => ({ ...prev, [key]: parseInt(value) }));
   };
 
   const handleSubmitVote = () => {
-    const userResult = determineType(userVote);
-    setUserResult(userResult);
-    const newVote = { ...userVote, type: userResult };
-    setVotes(prev => [...prev, newVote]);
+    const result = determineType(userVote);
+    setUserResult(result);
+    setVotes((prev) => [...prev, { ...userVote, type: result }]);
     setShowResults(true);
   };
 
   const calculateFinalResult = () => {
     if (votes.length === 0) return null;
-    const counts = { "Мачо": 0, "Сапиосексуал": 0, "Интеллектуал": 0 };
-    votes.forEach(vote => counts[vote.type]++);
-    const maxCount = Math.max(...Object.values(counts));
-    return Object.keys(counts).find(type => counts[type] === maxCount);
+    const counts = { "интеллектуал": 0, "решала": 0, "спортик": 0 };
+    votes.forEach((v) => (counts[v.type] += 1));
+    const max = Math.max(...Object.values(counts));
+    return Object.keys(counts).find((k) => counts[k] === max);
   };
 
   useEffect(() => {
@@ -64,84 +69,63 @@ const App = () => {
   }, [votes, showResults]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative bg-white text-gray-800">
-      <div className="absolute inset-0 z-0 opacity-10">
-        <img
-          src="/android_resized.png"
-          alt="Андроид"
-          className="w-full h-full object-contain mx-auto"
-        />
-      </div>
-      <div className="relative z-10 max-w-2xl w-full mx-auto bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-gray-200">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-4">Собери своего андроида</h1>
-          <p className="text-lg">Выберите значения для каждого параметра от 1 до 10.</p>
-        </div>
-        <div className="space-y-6">
-          {parameters.map((param) => (
-            <div key={param.key}>
-              <label className="block text-lg font-semibold">{param.name}</label>
-              <div className="flex items-center space-x-4">
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  value={userVote[param.key]}
-                  onChange={(e) => handleInputChange(param.key, e.target.value)}
-                  className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                />
-                <span className="text-xl font-medium w-8">{userVote[param.key]}</span>
+    <div
+      className="page-bg"
+      style={{ backgroundImage: `url('${BG_IMAGE}')` }}
+    >
+      <div className="wrap">
+        <div className="card">
+          <header className="card-header">
+            <h1 className="title">
+              Добро пожаловать в Humanitas Engineering
+              <br />
+              <span className="subtitle">Создайте своего идеального партнёра</span>
+            </h1>
+            <p className="lead">Выберите значения для каждого параметра от 1 до 10.</p>
+          </header>
+
+          <section className="sliders">
+            {parameters.map((p) => (
+              <div key={p.key} className="slider-row">
+                <label className="slider-label" htmlFor={p.key}>{p.name}</label>
+                <div className="slider-control">
+                  <input
+                    id={p.key}
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={userVote[p.key]}
+                    onChange={(e) => handleInputChange(p.key, e.target.value)}
+                  />
+                  <span className="slider-value">{userVote[p.key]}</span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-        {!showResults ? (
-          <button
-            onClick={handleSubmitVote}
-            className="w-full mt-8 bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 px-6 rounded-xl text-lg transition"
-          >
-            Отправить голос
-          </button>
-        ) : (
-          <div className="mt-8 space-y-6">
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-              <h3 className="text-lg font-semibold text-green-800 mb-2">Ваш результат:</h3>
-              <p className="text-2xl font-bold text-green-700">{userResult}</p>
-            </div>
-            {finalResult && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">Финальный результат:</h3>
-                <p className="text-2xl font-bold text-blue-700">{finalResult}</p>
-                <p className="text-sm text-blue-600 mt-2">
-                  Определено на основе голосов {votes.length} участников
-                </p>
+            ))}
+          </section>
+
+          {!showResults ? (
+            <button className="submit-btn" onClick={handleSubmitVote}>
+              Отправить голос
+            </button>
+          ) : (
+            <section className="results">
+              <div className="result-box green">
+                <h3>Ваш результат:</h3>
+                <p className="result-text">{userResult}</p>
               </div>
-            )}
-          </div>
-        )}
-        <div className="mt-6 text-center text-sm text-gray-500">Голосование проходит анонимно</div>
+              {finalResult && (
+                <div className="result-box blue">
+                  <h3>Финальный результат:</h3>
+                  <p className="result-text">{finalResult}</p>
+                  <p className="muted">Определено на основе голосов {votes.length} участников</p>
+                </div>
+              )}
+            </section>
+          )}
+        </div>
+
+        <p className="footnote">Голосование проходит анонимно</p>
       </div>
-      <style jsx>{`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background-color: #3b82f6;
-          cursor: pointer;
-          border: 2px solid white;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        .slider::-moz-range-thumb {
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background-color: #3b82f6;
-          cursor: pointer;
-          border: 2px solid white;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-      `}</style>
     </div>
   );
 };
