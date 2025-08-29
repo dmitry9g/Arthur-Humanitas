@@ -5,7 +5,7 @@ const App = () => {
   const [votes, setVotes] = useState([]);
   const [userVote, setUserVote] = useState({
     emotionality: 5,
-    tactility: 7,
+    masculinity: 7,
     sexuality: 4,
     intellect: 9,
     sociability: 5,
@@ -17,7 +17,7 @@ const App = () => {
 
   const parameters = [
     { name: "Эмоциональность", key: "emotionality" },
-    { name: "Тактильность", key: "tactility" },
+    { name: "Мужественность", key: "masculinity" },
     { name: "Сексуальность", key: "sexuality" },
     { name: "Интеллект", key: "intellect" },
     { name: "Общительность", key: "sociability" },
@@ -26,9 +26,9 @@ const App = () => {
 
   const determineType = (vote) => {
     const scores = {
-      "Секси кошка": vote.sexuality * 0.4 + vote.emotionality * 0.3 + vote.tactility * 0.2 + vote.sociability * 0.1,
-      "Нимфетка": vote.sexuality * 0.3 + vote.emotionality * 0.3 + vote.sociability * 0.2 + vote.decisiveness * 0.2,
-      "Интеллектуалка": vote.intellect * 0.4 + vote.emotionality * 0.2 + vote.sociability * 0.2 + vote.decisiveness * 0.2,
+      "Мачо": vote.sexuality * 0.4 + vote.emotionality * 0.3 + vote.masculinity * 0.5 + vote.sociability * 0.1,
+      "Сапиосексуал": vote.sexuality * 0.4 + vote.emotionality * 0.3 + vote.sociability * 0.3 + vote.decisiveness * 0.2,
+      "Интеллектуал": vote.intellect * 0.6 + vote.emotionality * 0.2 + vote.sociability * 0.2 + vote.decisiveness * 0.2,
     };
     const maxScore = Math.max(...Object.values(scores));
     return Object.keys(scores).find(key => scores[key] === maxScore);
@@ -51,7 +51,7 @@ const App = () => {
 
   const calculateFinalResult = () => {
     if (votes.length === 0) return null;
-    const counts = { "Секси кошка": 0, "Нимфетка": 0, "Интеллектуалка": 0 };
+    const counts = { "Мачо": 0, "Сапиосексуал": 0, "Интеллектуал": 0 };
     votes.forEach(vote => counts[vote.type]++);
     const maxCount = Math.max(...Object.values(counts));
     return Object.keys(counts).find(type => counts[type] === maxCount);
