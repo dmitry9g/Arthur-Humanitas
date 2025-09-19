@@ -29,7 +29,7 @@ const App = () => {
   const determineType = (v) => {
     const scores = {
       "интеллектуал": v.intellect * 0.6 + v.emotionality * 0.2 + v.decisiveness * 0.4 + v.masculinity * 0.2,
-      "решала":       v.decisiveness * 0.45 + v.masculinity * 0.35 + v.intellect * 0.1 + v.sexuality * 0.1,
+      "решала":       v.decisiveness * 0.45 + v.masculinity * 0.35 + v.intellect * 0.3 + v.sexuality * 0.1,
       "спортик":      v.athleticism * 0.6 + v.masculinity * 0.5 + v.sexuality * 0.2,
     };
     const max = Math.max(...Object.values(scores));
