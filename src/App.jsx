@@ -1,24 +1,22 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 
-// Фон: положите файл с ИМЕНЕМ ровно "android_reseized.png" в папку public/
 const BG_IMAGE = "/android_reseized.png";
 
 const App = () => {
   const [votes, setVotes] = useState([]);
   const [userVote, setUserVote] = useState({
-    emotionality: 5,   // Эмоциональность
-    masculinity: 5,    // Мужественность
-    sexuality: 5,      // Сексуальность
-    intellect: 5,      // Интеллект
-    athleticism: 5,    // Атлетичность
-    decisiveness: 5,   // Решительность
+    emotionality: 3,   // Эмоциональность
+    masculinity: 6,    // Мужественность
+    sexuality: 7,      // Сексуальность
+    intellect: 8,      // Интеллект
+    athleticism: 6,    // Атлетичность
+    decisiveness: 7,   // Решительность
   });
   const [showResults, setShowResults] = useState(false);
   const [finalResult, setFinalResult] = useState(null);
   const [userResult, setUserResult] = useState(null);
 
-  // Параметры и метки для UI
   const parameters = [
     { name: "Эмоциональность", key: "emotionality" },
     { name: "Мужественность", key: "masculinity" },
@@ -28,16 +26,11 @@ const App = () => {
     { name: "Решительность", key: "decisiveness" },
   ];
 
-  // Определение типа (амплуа)
-  // Подбираем веса под новую логику:
-  // - "интеллектуал": упор на интеллект, немного на эмоции и решительность
-  // - "решала": решительность + мужественность, чуть интеллект/сексуальность
-  // - "спортик": атлетичность + мужественность, плюс немного сексуальности
   const determineType = (v) => {
     const scores = {
-      "интеллектуал": v.intellect * 0.5 + v.emotionality * 0.2 + v.decisiveness * 0.2 + v.masculinity * 0.1,
+      "интеллектуал": v.intellect * 0.6 + v.emotionality * 0.2 + v.decisiveness * 0.4 + v.masculinity * 0.2,
       "решала":       v.decisiveness * 0.45 + v.masculinity * 0.35 + v.intellect * 0.1 + v.sexuality * 0.1,
-      "спортик":      v.athleticism * 0.5 + v.masculinity * 0.3 + v.sexuality * 0.2,
+      "спортик":      v.athleticism * 0.6 + v.masculinity * 0.5 + v.sexuality * 0.2,
     };
     const max = Math.max(...Object.values(scores));
     return Object.keys(scores).find((k) => scores[k] === max);
@@ -69,22 +62,19 @@ const App = () => {
   }, [votes, showResults]);
 
   return (
-    <div
-      className="page-bg"
-      style={{ backgroundImage: `url('${BG_IMAGE}')` }}
-    >
+    <div className="page-bg" style={{ backgroundImage: `url('${BG_IMAGE}')` }}>
       <div className="wrap">
         <div className="card">
-          <header className="card-header">
+          <div className="card-header">
             <h1 className="title">
               Добро пожаловать в Humanitas Engineering
               <br />
               <span className="subtitle">Создайте своего идеального партнёра</span>
             </h1>
             <p className="lead">Выберите значения для каждого параметра от 1 до 10.</p>
-          </header>
+          </div>
 
-          <section className="sliders">
+          <div className="sliders">
             {parameters.map((p) => (
               <div key={p.key} className="slider-row">
                 <label className="slider-label" htmlFor={p.key}>{p.name}</label>
@@ -101,14 +91,14 @@ const App = () => {
                 </div>
               </div>
             ))}
-          </section>
+          </div>
 
           {!showResults ? (
             <button className="submit-btn" onClick={handleSubmitVote}>
               Отправить голос
             </button>
           ) : (
-            <section className="results">
+            <div className="results">
               <div className="result-box green">
                 <h3>Ваш результат:</h3>
                 <p className="result-text">{userResult}</p>
@@ -120,7 +110,7 @@ const App = () => {
                   <p className="muted">Определено на основе голосов {votes.length} участников</p>
                 </div>
               )}
-            </section>
+            </div>
           )}
         </div>
 
